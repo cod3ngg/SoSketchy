@@ -8,7 +8,9 @@ const drawModeBtn = document.getElementById("draw-mode-btn");
 const eraseToolButton = document.getElementById("erase-tool-btn");
 const blackBrushButton = document.getElementById("black-brush-btn");
 const rainbowBrushButton = document.getElementById("rainbow-brush-btn");
+const brushColorPick = document.getElementById("brushcolor");
 const clearButton = document.getElementById("clear-btn");
+const sliderErase = document.getElementById("slider-erase");
 
 const boardSize = 860;
 let N = 16;
@@ -18,20 +20,25 @@ let isRainbowMode = false;
 let isCustomColor = false;
 let isEraseMode = false;
 let isMouseDown = false;
+let clearState = false;
+let slideEraseState = false;
 
 //Function to create the sketch board
 function createPixelForBoard(X) {
     let pixelSize = boardSize / X;
-    for (let i = 0; i < X * X; i++){
-        
-        const canvasPixel = document.createElement("div");
-        canvasPixel.setAttribute("id", "pixel");
-        canvasPixel.setAttribute(`style`,
+    N = X;
+    for (let j = 1; j <= X; j++){
+        for (let i = 1; i <= X; i++) {
+            const canvasPixel = document.createElement("div");
+            canvasPixel.setAttribute("id", `pixel`);
+            canvasPixel.classList.add(`pixel-${i}`)
+            canvasPixel.setAttribute(`style`,
             `
             width: ${pixelSize}px;
             height: ${pixelSize}px;
             `)
-        sketchBoard.appendChild(canvasPixel);
+            sketchBoard.appendChild(canvasPixel);
+        }
     }
     console.log(`Created a board with ${X}`);
     colorOverPixel();
@@ -129,33 +136,59 @@ function removePixel() {
     })
 }
 
-
 //Code for adding pixel behaviour: Adding and removing
 function colorOverPixel() {
     const pixelBit = document.querySelectorAll("#pixel");
-    
 
     pixelBit.forEach((div) => {
+        let pixelOpacity = 0.0;
         div.addEventListener("mouseover", () => {
-            let pixelOpacity = 0.0;
-            if (isMouseDown) {
-                div.style.backgroundColor = setColor();
+            if (isMouseDown && isDrawMode) {
+                div.style.backgroundColor = setColor(pixelOpacity);
+                pixelOpacity = pixelOpacity += 0.1;
             } else if (isDrawMode == false) {
-                div.style.backgroundColor = setColor();
+                div.style.backgroundColor = setColor(pixelOpacity);
+                pixelOpacity += 0.1;
             }
         });
         div.addEventListener("dragstart", (event) => { 
             event.preventDefault();
         });
+        
+        clearButton.addEventListener("click", () => { 
+            pixelBit.forEach((div) => {
+                div.style.backgroundColor = "";
+                pixelOpacity = 0.0;
+            });
+        });
+
+        sliderErase.addEventListener("input", () => { 
+                pixelOpacity = 0.0;
+        });
     });
 }
 
-function clearPixelColor() {
-    const pixelBit = document.querySelectorAll("#pixel");
+function setColor(objectOpacity) {
+    let colorPicked = "";
 
-    pixelBit.forEach((div) => {
-        div.style.backgroundColor = "";
-    });
+    if (defaultBlack) {
+        return colorPicked = `rgba(15, 15, 15, ${objectOpacity})`;
+    }
+    else if (isRainbowMode) {
+        return colorPicked = `rgb(${randomColor() + 50}, ${randomColor() + 50}, ${randomColor() + 50})`;
+    }
+    else if (isEraseMode) {
+        return colorPicked;
+    }
+    else { 
+        return brushColorPick.value;
+    }
+}
+
+function randomColor() {
+    let randomNum = Math.floor(Math.random() * 200);
+    console.log(randomNum);
+    return randomNum;
 }
 
 // Code for Draw mode - Click and drag to draw
@@ -168,19 +201,6 @@ drawModeBtn.addEventListener("click", () => {
     }
     console.log(`Draw mode is ${isDrawMode}`);
 });
-
-sketchBoard.addEventListener(`mousedown`, function () {
-    isMouseDown = true;
-    colorOverPixel();
-});
-
-document.addEventListener(`mouseup`, function () {
-    isMouseDown = false;
-});
-
-//Tests Go Below This Code
-
-const brushColorPick = document.getElementById("brushcolor");
 
 eraseToolButton.addEventListener("click", () => { 
     isEraseMode = true;
@@ -214,30 +234,55 @@ brushColorPick.addEventListener("change", () => {
     console.log(`User Custom Color`);
 });
 
-clearButton.addEventListener("click", () => { 
-    clearPixelColor();
+sketchBoard.addEventListener(`mousedown`, function () {
+    isMouseDown = true;
+    colorOverPixel();
+});
+
+document.addEventListener(`mouseup`, function () {
+    isMouseDown = false;
+});
+
+//Tests Go Below This Code
+
+
+const pixel1 = document.querySelectorAll(".pixel-2");
+pixel1.forEach((div) => {
+    
+})
+
+let pixelSize = boardSize / N;
+let pixelMax = pixelSize;
+let pixelMin = pixelMax - 30;
+let col = 1;
+
+sliderErase.addEventListener("input", () => { 
+    let sliderValue = sliderErase.value;
+
+    if (sliderValue > pixelMin && sliderValue < pixelMax) {
+        eraseColumn(col);
+        pixelMax = pixelSize * col;
+        pixelMin = pixelMax - 30;
+        console.log(`Erased col: ${col}`);
+        console.log(pixelMax);
+    } else if (sliderValue == 0) {
+        pixelMax = pixelSize;
+        pixelMin = pixelMax - 30;
+        col = 1;
+    } else {
+        console.log(`No columns erased`)
+    }
+    
+   
 });
 
 //Test Function Go Here:
-function setColor() {
-    let colorPicked = "";
 
-    if (defaultBlack) {
-        return colorPicked = "#151515";
-    }
-    else if (isRainbowMode) {
-        return colorPicked = `rgb(${randomColor() + 50}, ${randomColor() + 50}, ${randomColor() + 50})`;
-    }
-    else if (isEraseMode) {
-        return colorPicked = "";
-    }
-    else { 
-        return brushColorPick.value;
-    }
-}
+function eraseColumn(x) {
+    let pixelCol = document.querySelectorAll(`.pixel-${x}`);
+    pixelCol.forEach((div) => {
+        div.style.backgroundColor = "rgba(241, 241, 241, 0.0)";
+    });
 
-function randomColor() {
-    let randomNum = Math.floor(Math.random() * 200);
-    console.log(randomNum);
-    return randomNum;
+    col = col + 1;
 }
