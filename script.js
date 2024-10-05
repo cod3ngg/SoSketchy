@@ -22,6 +22,7 @@ let isEraseMode = false;
 let isMouseDown = false;
 let clearState = false;
 let slideEraseState = false;
+let col = 1;
 
 //Function to create the sketch board
 function createPixelForBoard(X) {
@@ -41,7 +42,9 @@ function createPixelForBoard(X) {
         }
     }
     console.log(`Created a board with ${X}`);
+    pixelSize = boardSize / N;
     colorOverPixel();
+    createSliderEraser(X);
 }
 
 createPixelForBoard(N);
@@ -156,10 +159,8 @@ function colorOverPixel() {
         });
         
         clearButton.addEventListener("click", () => { 
-            pixelBit.forEach((div) => {
-                div.style.backgroundColor = "";
-                pixelOpacity = 0.0;
-            });
+            div.style.backgroundColor = "";
+            pixelOpacity = 0.0;
         });
 
         sliderErase.addEventListener("input", () => { 
@@ -245,36 +246,30 @@ document.addEventListener(`mouseup`, function () {
 
 //Tests Go Below This Code
 
+function createSliderEraser(inputNumSize) {
+    let pixelSize = boardSize / inputNumSize;
+    let pixelMax = pixelSize;
+    let pixelMin = 0;
 
-const pixel1 = document.querySelectorAll(".pixel-2");
-pixel1.forEach((div) => {
+    sliderErase.addEventListener("input", () => {
+        let sliderValue = sliderErase.value;
+
+        if (sliderValue > pixelMin && sliderValue < pixelMax) {
+            eraseColumn(col);
+            pixelMin = pixelMax;
+            pixelMax = pixelSize * col;
+            console.log(`Erased col: ${col}`);
+            console.log(pixelMax);
+        } else if (sliderValue == 0) {
+            pixelMax = pixelSize;
+            pixelMin = 0;
+            col = 1;
+        } else {
+            console.log(`No columns erased`)
+        }
     
-})
-
-let pixelSize = boardSize / N;
-let pixelMax = pixelSize;
-let pixelMin = pixelMax - 30;
-let col = 1;
-
-sliderErase.addEventListener("input", () => { 
-    let sliderValue = sliderErase.value;
-
-    if (sliderValue > pixelMin && sliderValue < pixelMax) {
-        eraseColumn(col);
-        pixelMax = pixelSize * col;
-        pixelMin = pixelMax - 30;
-        console.log(`Erased col: ${col}`);
-        console.log(pixelMax);
-    } else if (sliderValue == 0) {
-        pixelMax = pixelSize;
-        pixelMin = pixelMax - 30;
-        col = 1;
-    } else {
-        console.log(`No columns erased`)
-    }
-    
-   
-});
+    });
+}
 
 //Test Function Go Here:
 
