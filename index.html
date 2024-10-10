@@ -4,21 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SoSketchy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Pacifico&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/80251b0f3d.js" crossorigin="anonymous"></script>
+
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
 </head>
 <body>
     <div id="main-container">
-        <h1 style=" padding:5rem; text-align: center;">SoSketchy</h1>
-        
-        <div id="sketch-controls">
-            <button id="change-size-btn">Change Size</button>
-            <button id="draw-mode-btn">Draw Mode</button>
-            <button id="erase-tool-btn">Erase</button>
-            <button id="black-brush-btn">Black</button>
-            <button id="rainbow-brush-btn">Rainbow</button>
-            <input type="color" name="brushcolor" id="brushcolor" />
-            <button id="clear-btn">Clear</button>
+        <div id="navbar-header">
+            <h1 id="web-name">SoSketchy</h1>
+            <div id="sketch-controls">
+                <div class="fade-edge" id="control-buttons">
+                <button id="change-size-btn">Change Size</button>
+                <button id="draw-mode-btn">Draw Mode</button>
+                <button id="erase-tool-btn">Erase</button>
+                <button id="black-brush-btn">Black</button>
+                <button id="rainbow-brush-btn">Rainbow</button>
+                <input type="color" name="brushcolor" id="brushcolor" />
+                <button id="clear-btn">Clear</button>
+                </div>
+            </div>
         </div>
 
         <div id="sketch-container">
@@ -27,9 +35,25 @@
         </div>
 
         <input id="slider-erase" name="slider-erase" type="range" min="0" max="860" value="0" />
-        <div id="footer"></div>
+
+        <div id="about-container">
+            <section id="about-content">
+                <h1>About SoSketchy</h1>
+                <p>This is a personal project of Lorenz Yboa for the application of knowledge and skills in web development and web application. This web application is inspired by toys for children called "Itch-a-sketch", which I remember playing with my friends and having fun drawing what-ever we want. </p>
+
+                <p>SoSketchy is made of pure HTML, CSS, and Javascript. No libraries, frameworks, etc. But my future projects will include all the tools and latest technology in web develpment. Hope you enjoy SoSketchy and I am open for more coffee at my table at any time.</p>
+
+                <span><a href="" target="none">By Me A Coffee</a></span>
+            </section>
+        </div>
     </div>
-
-
+    <div id="footer">
+        <h2>@LorenzYboa</h2>
+        <span>
+            <a href="" target="_blank"><i class="fa-brands fa-github"></i></a>
+            <a href="" target="_blank"><i class="fa-brands fa-discord"></i></a>
+            <a href="" target="_blank"><i class="fa-brands fa-linkedin"></i></a>
+        </span>
+    </div>
 </body>
 </html>

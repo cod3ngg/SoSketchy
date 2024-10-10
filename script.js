@@ -1,9 +1,11 @@
 const mainBody = document.querySelector("body");
 const mainContainer = document.getElementById("main-container");
+const sketchControls = document.getElementById("sketch-controls")
 const sketchBoard = document.getElementById("sketch-board");
-const changeSizeBtn = document.getElementById("change-size-btn");
 const divPrompt = document.createElement("div");
 
+const buttonAll = document.querySelectorAll("button");
+const changeSizeBtn = document.getElementById("change-size-btn");
 const drawModeBtn = document.getElementById("draw-mode-btn");
 const eraseToolButton = document.getElementById("erase-tool-btn");
 const blackBrushButton = document.getElementById("black-brush-btn");
@@ -14,7 +16,7 @@ const sliderErase = document.getElementById("slider-erase");
 
 const boardSize = 860;
 let N = 16;
-let isDrawMode = false;
+let isDrawMode = true;
 let defaultBlack = true;
 let isRainbowMode = false;
 let isCustomColor = false;
@@ -59,8 +61,9 @@ function changeSizePrompt() {
         filter: blur(5px);
         `)
     divPrompt.insertAdjacentHTML("beforeend", `
+        <span id="x-row"><i id="x-close" class="fa-solid fa-x"></i></span>
         <p id="text-prompt">Enter number of Pixels</p>
-        <input id="input-prompt" type="number" required />
+        <input class="default-color" id="input-prompt" type="number" placeholder="1-100px" required/>
         <button id="btn-prompt" type="submit">Done</button>
         <p id="error-prompt"></p>
         `);
@@ -69,6 +72,7 @@ function changeSizePrompt() {
 
     const inputPrompt = document.getElementById("input-prompt");
     const buttonPrompt = document.getElementById("btn-prompt");
+    const closeBtn = document.getElementById("x-close");
     
     buttonPrompt.addEventListener("click", () => {
         let inputNum = parseInt(inputPrompt.value);
@@ -84,37 +88,93 @@ function changeSizePrompt() {
         } else {
             errorInputSize(inputNum);
         }
-    }); 
+    });
+
+    buttonPrompt.addEventListener("mouseover", () => { 
+        buttonPrompt.style.backgroundColor = "#1aa5f0";
+    });
+    buttonPrompt.addEventListener("mouseout", () => { 
+
+        buttonPrompt.style.backgroundColor = "#118fc9";
+    });
+
+    closeBtn.addEventListener("mouseover", () => {
+        closeBtn.setAttribute(`style`, `
+            color: #118fc9;
+            cursor: pointer;
+        `);
+        closeBtn.addEventListener("click", () => {
+            divPrompt.textContent = "";
+            mainBody.removeChild(divPrompt);
+            mainContainer.setAttribute(`style`, `
+                filter: none;
+            `)
+        });
+    });
+    closeBtn.addEventListener("mouseout", () => { 
+        closeBtn.setAttribute(`style`, `
+            color: ;
+        `);
+    });
 }
 
 function stylePrompt(mainDiv) {
     const textPrompt = document.getElementById("text-prompt");
     const inputPrompt = document.getElementById("input-prompt");
     const buttonPrompt = document.getElementById("btn-prompt");
+    const closeRow = document.getElementById("x-row");
     mainDiv.setAttribute(`style`, `
-            display: flex;
-            flex-direction: column;
-            justify-items: center;
-            flex-wrap: wrap;
-            position: absolute;
-            z-index: 6;
             width: 25rem;
             height: 22rem;
-            background-color: gray;
-            padding: 10px;
+            display: flex;
+            position: fixed;
+            flex-direction: column;
+            justify-items: center;
             align-items: center;
+            flex-wrap: wrap;
+            background-color: #CFCFCF;
+            margin: 25vh auto;
+            padding: 8px;
+            z-index: 6;
+            border-radius: 15px;
+            box-shadow: 0px 0px 8px 3px #AAAAAA;
+        `);
+    closeRow.setAttribute(`style`, ` 
+            width: 22rem;
+            display: flex;
+            justify-content: flex-end;
+            margin-top: .7rem;
         `);
     textPrompt.setAttribute(`style`, `
             width: 100%;
             height: 3rem;
+            color: #116ac8;
+            font-size: 1.3rem;
+            font-weight: 600;
             text-align: center;
+            margin-top: 4rem;
         `);
     inputPrompt.setAttribute(`style`, `
             height: 2rem;
+            placeholder: Hello;
+            font-family: Manrope, sans-serif;
+            font-size: 1rem;
+            text-align: center;
         `);
     buttonPrompt.setAttribute(`style`, `
-        
+            height: 30px;
+            width: 85px;
+            background-color: #118fc9;
+            color: #f1f1f1;
+            font-family: Manrope, sans-serif;
+            font-weight: 900;
+            font-size: 1.1vw;
+            word-wrap: wrap;
+            border-radius: 7px;
+            border: none;
+            margin-top: 1rem;
         `);
+
 }
 
 function errorInputSize(inputNum) {
@@ -147,17 +207,30 @@ function colorOverPixel() {
         let pixelOpacity = 0.0;
         div.addEventListener("mouseover", () => {
             if (isMouseDown && isDrawMode) {
+                if (defaultBlack) {
+                    pixelOpacity += 0.1;
+                }
                 div.style.backgroundColor = setColor(pixelOpacity);
-                pixelOpacity = pixelOpacity += 0.1;
             } else if (isDrawMode == false) {
+                if (defaultBlack) {
+                    pixelOpacity += 0.1;
+                }
                 div.style.backgroundColor = setColor(pixelOpacity);
-                pixelOpacity += 0.1;
             }
         });
-        div.addEventListener("dragstart", (event) => { 
+
+        div.addEventListener("dragstart", function (event) { 
             event.preventDefault();
         });
-        
+
+        document.addEventListener(`mousedown`, function () {
+            isMouseDown = true;
+        });
+
+        document.addEventListener(`mouseup`, function () {
+            isMouseDown = false;
+        });
+
         clearButton.addEventListener("click", () => { 
             div.style.backgroundColor = "";
             pixelOpacity = 0.0;
@@ -176,7 +249,7 @@ function setColor(objectOpacity) {
         return colorPicked = `rgba(15, 15, 15, ${objectOpacity})`;
     }
     else if (isRainbowMode) {
-        return colorPicked = `rgb(${randomColor() + 50}, ${randomColor() + 50}, ${randomColor() + 50})`;
+        return colorPicked = `rgb(${randomColor() + 30}, ${randomColor() + 30}, ${randomColor() + 30})`;
     }
     else if (isEraseMode) {
         return colorPicked;
@@ -187,64 +260,10 @@ function setColor(objectOpacity) {
 }
 
 function randomColor() {
-    let randomNum = Math.floor(Math.random() * 200);
+    let randomNum = Math.floor(Math.random() * 180);
     console.log(randomNum);
     return randomNum;
 }
-
-// Code for Draw mode - Click and drag to draw
-
-drawModeBtn.addEventListener("click", () => { 
-    if (!isDrawMode) {
-        isDrawMode = true;
-    } else {
-        isDrawMode = false;
-    }
-    console.log(`Draw mode is ${isDrawMode}`);
-});
-
-eraseToolButton.addEventListener("click", () => { 
-    isEraseMode = true;
-    defaultBlack = false;
-    isRainbowMode = false;
-    isCustomColor = false;
-    console.log(`Erase Tool On`);
-});
-
-blackBrushButton.addEventListener("click", () => { 
-    isEraseMode = false;
-    defaultBlack = true;
-    isRainbowMode = false;
-    isCustomColor = false;
-    console.log(`Black Brush On`);
-});
-
-rainbowBrushButton.addEventListener("click", () => {
-    isEraseMode = false;
-    defaultBlack = false;
-    isRainbowMode = true;
-    isCustomColor = false;
-    console.log(`Rainbow Mode On`);
-});
-
-brushColorPick.addEventListener("change", () => {
-    isEraseMode = false;
-    defaultBlack = false;
-    isRainbowMode = false;
-    isCustomColor = true;
-    console.log(`User Custom Color`);
-});
-
-sketchBoard.addEventListener(`mousedown`, function () {
-    isMouseDown = true;
-    colorOverPixel();
-});
-
-document.addEventListener(`mouseup`, function () {
-    isMouseDown = false;
-});
-
-//Tests Go Below This Code
 
 function createSliderEraser(inputNumSize) {
     let pixelSize = boardSize / inputNumSize;
@@ -271,8 +290,6 @@ function createSliderEraser(inputNumSize) {
     });
 }
 
-//Test Function Go Here:
-
 function eraseColumn(x) {
     let pixelCol = document.querySelectorAll(`.pixel-${x}`);
     pixelCol.forEach((div) => {
@@ -281,3 +298,141 @@ function eraseColumn(x) {
 
     col = col + 1;
 }
+
+buttonAll.forEach((button) => {
+    button.addEventListener("mousedown", () => {
+        button.setAttribute(`style`, `
+                background-color: #118fc9;
+                color: #f1f1f1;
+            `);
+    });
+    document.addEventListener("mouseup", () => {
+        button.setAttribute(`style`, `
+            background-color: "";
+            color: "";
+        `);
+        
+        if (isDrawMode) {
+            drawModeBtn.setAttribute(`style`, `
+                background-color: #118fc9;
+                color: #f1f1f1;
+            `);
+        }
+        
+        if (isEraseMode) {
+            eraseToolButton.setAttribute(`style`, `
+                background-color: #118fc9;
+                color: #f1f1f1;
+            `);
+        } else if (defaultBlack) {
+            blackBrushButton.setAttribute(`style`, `
+                background-color: #118fc9;
+                color: #f1f1f1;
+            `);
+        } else if (isRainbowMode) {
+            rainbowBrushButton.setAttribute(`style`, `
+                background-color: #118fc9;
+                color: #f1f1f1;
+            `);
+        }
+    });
+});
+
+if (defaultBlack) {
+    blackBrushButton.setAttribute(`style`, `
+        background-color: #118fc9;
+        color: #f1f1f1;
+    `);
+}
+
+
+// Code for Draw mode - Click and drag to draw
+
+drawModeBtn.addEventListener("mouseup", () => { 
+    if (!isDrawMode) {
+        isDrawMode = true;
+    } else {
+        isDrawMode = false;
+    }
+    console.log(`Draw mode is ${isDrawMode}`);
+});
+
+eraseToolButton.addEventListener("mouseup", () => { 
+    isEraseMode = true;
+    defaultBlack = false;
+    isRainbowMode = false;
+    isCustomColor = false;
+    console.log(`Erase Tool On`);
+});
+
+blackBrushButton.addEventListener("mouseup", () => { 
+    isEraseMode = false;
+    defaultBlack = true;
+    isRainbowMode = false;
+    isCustomColor = false;
+    console.log(`Black Brush On`);
+});
+
+rainbowBrushButton.addEventListener("mouseup", () => {
+    isEraseMode = false;
+    defaultBlack = false;
+    isRainbowMode = true;
+    isCustomColor = false;
+    console.log(`Rainbow Mode On`);
+});
+
+brushColorPick.addEventListener("change", () => {
+    isEraseMode = false;
+    defaultBlack = false;
+    isRainbowMode = false;
+    isCustomColor = true;
+    console.log(`User Custom Color`);
+    if (isCustomColor) {
+            brushColorPick.setAttribute(`style`, `
+                background-color: #118fc9;
+                color: #f1f1f1;
+            `);
+    }
+});
+
+sketchControls.addEventListener("mouseup", () => { 
+    if (isCustomColor === false) {
+        brushColorPick.setAttribute(`style`, `
+            background-color: "";
+            color: "";
+        `);
+    }
+});
+
+//Tests Go Below This Code
+const controlButtons = document.getElementById("sketch-controls")
+let startX;
+let scrollLeft;
+
+let startDragging = function (e) {
+    isMouseDown = true;
+    startX = e.pageX - controlButtons.offsetLeft;
+    scrollLeft = controlButtons.scrollLeft;
+};
+
+let stopDragging = function (event) {
+    isMouseDown = false;
+}
+
+controlButtons.addEventListener('mousemove', (e) => { 
+    e.preventDefault();
+    if (!isMouseDown) {
+        return;
+    }
+    const x = e.pageX - controlButtons.offsetLeft;
+    const scroll = x - startX;
+    controlButtons.scrollLeft = scrollLeft - scroll;
+});
+
+controlButtons.addEventListener("mousedown", startDragging, false);
+controlButtons.addEventListener("mousemove", stopDragging, false);
+controlButtons.addEventListener("mouseleave", stopDragging, false);
+//For Touch Screen Drag
+
+
+//Test Function Go Here:
