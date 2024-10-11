@@ -14,9 +14,9 @@ const brushColorPick = document.getElementById("brushcolor");
 const clearButton = document.getElementById("clear-btn");
 const sliderErase = document.getElementById("slider-erase");
 
-const boardSize = 860;
+const boardSize = 80;
 let N = 16;
-let isDrawMode = true;
+let isDrawMode = false;
 let defaultBlack = true;
 let isRainbowMode = false;
 let isCustomColor = false;
@@ -37,8 +37,8 @@ function createPixelForBoard(X) {
             canvasPixel.classList.add(`pixel-${i}`)
             canvasPixel.setAttribute(`style`,
             `
-            width: ${pixelSize}px;
-            height: ${pixelSize}px;
+            width: ${pixelSize}vw;
+            height: ${pixelSize}vw;
             `)
             sketchBoard.appendChild(canvasPixel);
         }
@@ -217,6 +217,20 @@ function colorOverPixel() {
                 }
                 div.style.backgroundColor = setColor(pixelOpacity);
             }
+        });
+
+        div.addEventListener("touchstart", () => { 
+            if (isMouseDown && isDrawMode) {
+                if (defaultBlack) {
+                    pixelOpacity += 0.1;
+                }
+                div.style.backgroundColor = setColor(pixelOpacity);
+            } else if (isDrawMode == false) {
+                if (defaultBlack) {
+                    pixelOpacity += 0.1;
+                }
+                div.style.backgroundColor = setColor(pixelOpacity);
+            }            
         });
 
         div.addEventListener("dragstart", function (event) { 
@@ -405,34 +419,7 @@ sketchControls.addEventListener("mouseup", () => {
 });
 
 //Tests Go Below This Code
-const controlButtons = document.getElementById("sketch-controls")
-let startX;
-let scrollLeft;
 
-let startDragging = function (e) {
-    isMouseDown = true;
-    startX = e.pageX - controlButtons.offsetLeft;
-    scrollLeft = controlButtons.scrollLeft;
-};
-
-let stopDragging = function (event) {
-    isMouseDown = false;
-}
-
-controlButtons.addEventListener('mousemove', (e) => { 
-    e.preventDefault();
-    if (!isMouseDown) {
-        return;
-    }
-    const x = e.pageX - controlButtons.offsetLeft;
-    const scroll = x - startX;
-    controlButtons.scrollLeft = scrollLeft - scroll;
-});
-
-controlButtons.addEventListener("mousedown", startDragging, false);
-controlButtons.addEventListener("mousemove", stopDragging, false);
-controlButtons.addEventListener("mouseleave", stopDragging, false);
 //For Touch Screen Drag
-
 
 //Test Function Go Here:
