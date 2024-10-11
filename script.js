@@ -51,7 +51,7 @@ function createPixelForBoard(X) {
 
 createPixelForBoard(N);
 
-//Custom Prompt I made: Since you cant directly style the alert method 
+//Custom Prompt I made: Since you cant directly style the alert method
 changeSizeBtn.addEventListener("click", () => {
     changeSizePrompt();
 });
@@ -69,6 +69,7 @@ function changeSizePrompt() {
         `);
     mainBody.appendChild(divPrompt);
     stylePrompt(divPrompt);
+    divPrompt.classList.add("mb-prompt");
 
     const inputPrompt = document.getElementById("input-prompt");
     const buttonPrompt = document.getElementById("btn-prompt");
@@ -88,6 +89,15 @@ function changeSizePrompt() {
         } else {
             errorInputSize(inputNum);
         }
+    });
+
+    divPrompt.addEventListener("keydown", (event) => {
+        if (event.key === 'Enter') {
+            buttonPrompt.click();
+        } else if (event.key === 'Escape') {
+            closeBtn.click();
+        }
+
     });
 
     buttonPrompt.addEventListener("mouseover", () => { 
@@ -139,12 +149,13 @@ function stylePrompt(mainDiv) {
             border-radius: 15px;
             box-shadow: 0px 0px 8px 3px #AAAAAA;
         `);
+    
     closeRow.setAttribute(`style`, ` 
             width: 22rem;
             display: flex;
             justify-content: flex-end;
             margin-top: .7rem;
-        `);
+        `); 
     textPrompt.setAttribute(`style`, `
             width: 100%;
             height: 3rem;
@@ -155,11 +166,14 @@ function stylePrompt(mainDiv) {
             margin-top: 4rem;
         `);
     inputPrompt.setAttribute(`style`, `
+            -webkit-appearance: none;
             height: 2rem;
-            placeholder: Hello;
             font-family: Manrope, sans-serif;
+            font-weight: 500;
+            color: #1a1a1a;
             font-size: 1rem;
             text-align: center;
+            border: none;
         `);
     buttonPrompt.setAttribute(`style`, `
             height: 30px;
@@ -174,7 +188,7 @@ function stylePrompt(mainDiv) {
             border: none;
             margin-top: 1rem;
         `);
-
+    inputPrompt.focus();
 }
 
 function errorInputSize(inputNum) {
@@ -217,20 +231,6 @@ function colorOverPixel() {
                 }
                 div.style.backgroundColor = setColor(pixelOpacity);
             }
-        });
-
-        div.addEventListener("touchstart", () => { 
-            if (isMouseDown && isDrawMode) {
-                if (defaultBlack) {
-                    pixelOpacity += 0.1;
-                }
-                div.style.backgroundColor = setColor(pixelOpacity);
-            } else if (isDrawMode == false) {
-                if (defaultBlack) {
-                    pixelOpacity += 0.1;
-                }
-                div.style.backgroundColor = setColor(pixelOpacity);
-            }            
         });
 
         div.addEventListener("dragstart", function (event) { 
@@ -293,13 +293,14 @@ function createSliderEraser(inputNumSize) {
             pixelMax = pixelSize * col;
             console.log(`Erased col: ${col}`);
             console.log(pixelMax);
-        } else if (sliderValue == 0) {
+        } else if (sliderValue == 0 || sliderValue == 80) {
             pixelMax = pixelSize;
             pixelMin = 0;
             col = 1;
         } else {
             console.log(`No columns erased`)
         }
+
     
     });
 }
